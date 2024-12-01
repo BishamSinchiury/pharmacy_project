@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+    body{
+        height: 100vh;
+        align-content: center;
+       
+    }
+       form{
+        display:flex;
+        flex-direction: column;
+        justify-content: center;
+        justify-self: center;
+        align-self: center;
+        background-color: aqua;
+        border-radius: 3vh;
+       }
+       form input{
+        margin-left:4vh;
+        margin-right: 4vh;
+        border:  solid 2px white;
+        margin-bottom: 2vh;
+       }
+       form label{
+        margin-left:4vh ;
+        margin-top: 2vh;
+        margin-bottom: 0.5vh;
+       }
+       form h1{
+        text-align: center;
+       }
+       #submit{
+        background-color: rgb(0, 0, 149);
+        height: 5vh;
+        color: white;
+        border-radius: 15px;
+        border: none;
+       }
+       #submit:hover{
+        background-color: blue;
+       }
+
+    </style>
+</head>
+<body>
+    <form action="" id="DocumentForm">
+        <h1>Upload Documents</h1>
+        <label for="passport_sized_photo"> Passport Size photo</label>
+        <input type="file", accept=".jpg, .png" name="passport_sized_photo">
+        <label for="signature"> Signature</label>
+        <input type="file", accept=".jpg, .png" name="signature">
+        <label for="citizenship_front"> Citizenship Front</label>
+        <input type="file", accept=".jpg, .png" name="citizenship_front">
+        <label for="citizenship_back"> Citizenship Back</label>
+        <input type="file" accept=".jpg, .png" name="citizenship_back">
+        <label for="location_map"> Location Map</label>
+        <input type="file" accept=".jpg, .png" name="location_map">
+        <label for="selfie_with_citizenship"> Selfi with citizenship</label>
+        <input type="file" accept=".jpg, .png " name="selfie_with_citizenship">
+        <input type="submit" name="Send" id="submit">
+    </form>
+    <script src="home.js"></script>
+</body>
+</html>

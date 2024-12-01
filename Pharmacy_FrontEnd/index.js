@@ -1,51 +1,101 @@
+// Highlight input field with an error
+function highlightError(inputId) {
+    const inputElement = document.getElementById(inputId);
+    if (inputElement) {
+        inputElement.style.border = "solid red"; // Highlight the border
+    }
+}
+
+// Clear error highlights (optional)
+function clearError(inputId) {
+    const inputElement = document.getElementById(inputId);
+    if (inputElement) {
+        inputElement.style.border = ""; // Reset the border
+    }
+}
 
 // Toggle password visibility
 function togglePassword() {
-const passwordField = document.getElementById('password');
-const toggleIcon = document.querySelector('.toggle-password-icon');
-
-if (passwordField.type === 'password') {
-    passwordField.type = 'text';
-    toggleIcon.textContent = '🫣'; // Change to 'hide' icon
+    const passwordField = document.getElementById('password');
+    const toggleIcon = document.querySelector('.toggle-password-icon');
+    
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        if (toggleIcon) toggleIcon.textContent = '🫣'; // Change to 'hide' icon
     } else {
-    passwordField.type = 'password';
-    toggleIcon.textContent = '😵‍💫'; // Change back to 'show' icon
+        passwordField.type = 'password';
+        if (toggleIcon) toggleIcon.textContent = '😵‍💫'; // Change back to 'show' icon
     }
 }
-const loginForm = document.getElementById('loginForm');
-const loginButton = document.getElementById('LoginButton');
 
-// Add event listener to handle form submission
-loginForm.addEventListener('submit', function(event) {
-    event.preventDefault();  // Prevent the default form submission
+// Handle form submission
+async function handleLogin(event) {
+    event.preventDefault(); // Prevent default form submission
 
-    // Get the email and password values from the input fields
+    // Get the email and password values
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
 
-    // Prepare the data to send in the POST request
-    const data = {
-        email: email,
-        password: password
-    };
+    // Clear previous errors
+    clearError('email');
+    clearError('password');
 
-    // Make the POST request using fetch
-    fetch('http://127.0.0.1:8000', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            // You can include an authorization token if needed
-            //'Authorization': 'Bearer your-token-here'
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())  // Parse the JSON response
-    .then(data => {
-        console.log('Success:', data);
-        // Handle successful login, e.g., redirect or show a message
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-        // Handle errors, e.g., display an error message
-    });
-});
+    const data = { email, password };
+
+    try {
+        // Send POST request to login endpoint
+        const response = await fetch('http://127.0.0.1:8000', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const responseData = await response.json();
+        // Handle server validation errors
+        if (responseData.message === "Invalid Email") {
+            highlightError("email");
+        } else if (responseData.message === "Invalid Password") {
+            highlightError("password");
+        }
+
+        // If the response contains a token, store it in localStorage
+        if (responseData.token) {
+            localStorage.setItem("jwtToken", responseData.token);
+
+            // Send GET request to the home endpoint
+            const homeResponse = await fetch('http://127.0.0.1:8000/home/', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${responseData.token}`,
+                },
+            });
+
+            if (!homeResponse.ok) {
+                throw new Error(`HTTP error! Status: ${homeResponse.status}`);
+            }
+
+            const homeData = await homeResponse.json();
+
+            // Redirect to the received URL
+            if (homeData.url) {
+                window.location.href = homeData.url;
+            } else {
+                console.error("No redirect URL found in response");
+            }
+        } else {
+            console.error("No token found in the response");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+// Add event listener to the login form
+document.getElementById('loginForm').addEventListener('submit', handleLogin);

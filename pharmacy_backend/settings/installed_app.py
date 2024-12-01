@@ -11,6 +11,7 @@ THIRD_PARTY_APPS = [
     'decouple',
     'rest_framework',
     'corsheaders',
+    "rest_framework_simplejwt",
   
 ]
 
